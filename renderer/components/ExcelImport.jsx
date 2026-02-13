@@ -83,7 +83,12 @@ export default function ExcelImport({ onTreeData }) {
         type="link"
         style={{ marginBottom: 8 }}
         onClick={() => {
-          window.open('/template.xlsx');
+          const a = document.createElement('a');
+          a.href = '/template.xlsx';
+          a.download = 'template.xlsx';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
         }}
       >
         下载Excel模板
