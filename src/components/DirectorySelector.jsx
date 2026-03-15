@@ -1,19 +1,19 @@
-// 目标根目录选择模块，集成主进程通信
+// 目标根目录选择模块，集成 Tauri API
 import React, { useState } from 'react';
 import { Button, message } from 'antd';
 import { FolderOpenOutlined } from '@ant-design/icons';
+import { invoke } from '@tauri-apps/api/tauri';
 
 // 组件：目标根目录选择
 export default function DirectorySelector({ onDirectorySelected }) {
   // 记录已选择的目录路径
   const [dirPath, setDirPath] = useState('');
 
-  // 选择目录，调用主进程方法
+  // 选择目录，调用 Tauri 命令
   const handleSelect = async () => {
     try {
-      // 通过 Electron 的 ipcRenderer 调用主进程
-      const { ipcRenderer } = window.require('electron');
-      const path = await ipcRenderer.invoke('select-directory');
+      // 通过 Tauri 的 invoke 调用后端命令
+      const path = await invoke('select_directory');
       if (path) {
         setDirPath(path);
         onDirectorySelected && onDirectorySelected(path);
@@ -21,7 +21,7 @@ export default function DirectorySelector({ onDirectorySelected }) {
         message.info('未选择任何目录');
       }
     } catch (err) {
-      message.error('目录选择失败：' + err.message);
+      message.error('目录选择失败：' + err);
     }
   };
 
@@ -34,4 +34,4 @@ export default function DirectorySelector({ onDirectorySelected }) {
       {dirPath && <div style={{ marginTop: 8 }}>已选择：{dirPath}</div>}
     </div>
   );
-} 
+}

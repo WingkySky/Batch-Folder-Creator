@@ -10,7 +10,7 @@ import {
 import ExcelImport from './components/ExcelImport';
 import DirectorySelector from './components/DirectorySelector';
 import FolderTreePreview from './components/FolderTreePreview';
-import BatchCreateActions from './components/BatchCreateActions';
+import CreateActions from './components/CreateActions';
 
 const { Header, Content, Sider } = Layout;
 
@@ -48,7 +48,7 @@ export default function App() {
       case 'action':
         // 传递 root、treeData、onCreatedPaths 给批量创建操作
         return (
-          <BatchCreateActions
+          <CreateActions
             root={rootDir}
             treeData={treeData}
             onCreatedPaths={setCreatedPaths}
