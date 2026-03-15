@@ -82,13 +82,21 @@ export default function ExcelImport({ onTreeData }) {
       <Button
         type="link"
         style={{ marginBottom: 8 }}
-        onClick={() => {
-          const a = document.createElement('a');
-          a.href = '/template.xlsx';
-          a.download = 'template.xlsx';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
+        onClick={async () => {
+          try {
+            const response = await fetch('/template.xlsx');
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'template.xlsx';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+          } catch (err) {
+            message.error('下载模板失败：' + err.message);
+          }
         }}
       >
         下载Excel模板
