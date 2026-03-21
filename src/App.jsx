@@ -37,7 +37,7 @@ const { Title } = Typography;
 
 // Excel 导入组件
 function ExcelImport() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { fileName, isParsing, setFileName, setTreeData, setParsing } = useAppStore();
 
   const handleFileUpload = async (file) => {
@@ -63,17 +63,18 @@ function ExcelImport() {
     return false;
   };
 
-  // 模板下载处理
+  // 模板下载处理 - 根据语言选择对应模板
   const downloadTemplate = async () => {
+    const templateFile = i18n.language === 'en' ? '/template_en.xlsx' : '/template.xlsx';
     try {
       message.loading({ content: t('messages.downloading'), key: 'download', duration: 0 });
-      const response = await fetch('/template.xlsx');
+      const response = await fetch(templateFile);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'template.xlsx';
+      a.download = templateFile.replace('/', '');
       document.body.appendChild(a);
       a.click();
       setTimeout(() => {
