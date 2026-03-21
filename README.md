@@ -1,88 +1,94 @@
-# 文件夹批量创建工具
+# Batch Folder Creator
 
-一款轻量级的跨平台桌面应用，通过 Excel 模板批量、分层级创建文件夹，支持一键撤销操作。
+A lightweight cross-platform desktop application that batch-creates hierarchical folder structures from Excel templates, with one-click undo support.
 
-## 功能特性
+## Features
 
-- 📊 **Excel 导入** - 支持 .xlsx/.xls 格式，自动解析多层级的文件夹结构
-- 📁 **批量创建** - 递归创建多层文件夹结构
-- ↩️ **一键撤销** - 删除本次创建的所有文件夹
-- 🌙 **暗色模式** - 支持亮色/暗色主题切换
-- 🌍 **中英双语** - 支持中文和英文界面
+- 📊 **Excel Import** - Supports .xlsx/.xls format, auto-parses multi-level folder structures
+- 📁 **Batch Creation** - Recursively creates multi-level folder hierarchies
+- ↩️ **One-Click Undo** - Deletes all folders created in the current session
+- 🌙 **Dark Mode** - Toggle between light and dark themes
+- 🌍 **Bilingual** - Supports both Chinese and English interfaces
 
-## 技术栈
+## Tech Stack
 
-- **框架**: Tauri 2.x (Rust + WebView)
-- **前端**: React 18 + Ant Design 5.x
-- **状态管理**: Zustand
-- **构建工具**: Vite 5.x
+- **Framework**: Tauri 2.x (Rust + WebView)
+- **Frontend**: React 18 + Ant Design 5.x
+- **State Management**: Zustand
+- **Build Tool**: Vite 5.x
+- **Internationalization**: i18next + react-i18next
 
-## 系统要求
+## System Requirements
 
-- Windows 10/11 或 macOS 10.15+
-- 无需额外安装运行时
+- Windows 10/11 or macOS 10.15+
+- No additional runtime required
 
-## 开发预览
+## Quick Start
 
 ```bash
-# 安装依赖
+# Install dependencies
 npm install
 
-# 启动开发服务器
+# Start development server
 npm run dev
 ```
 
-## 构建发布
+## Build for Production
 
 ```bash
-# 构建生产版本
+# Build production version
 npm run build
 
-# 构建产物位于
+# Build artifacts located at
 # src-tauri/target/release/bundle/
 ```
 
-## 使用说明
+## Usage Guide
 
-1. **准备 Excel 模板**
-   - 第一行为表头（会被忽略）
-   - 每列代表一层文件夹
-   - 示例：
+### 1. Prepare Excel Template
+- First row is header (ignored during parsing)
+- Each column represents one folder level
+- Example:
 
-   | 第一级 | 第二级 | 第三级 |
-   |--------|--------|--------|
-   | 项目A | 文档 | 合同 |
-   | 项目A | 文档 | 发票 |
-   | 项目A | 图片 | 产品照 |
+| Level 1 | Level 2 | Level 3 |
+|---------|---------|---------|
+| ProjectA | Documents | Contracts |
+| ProjectA | Documents | Invoices |
+| ProjectA | Images | Product Photos |
 
-2. **导入并创建**
-   - 点击"选择 Excel 文件"导入模板
-   - 点击"选择目标根目录"选择创建位置
-   - 点击"下一步"预览文件夹结构
-   - 点击"开始批量创建"执行创建
+### 2. Import and Create
+- Click "Select Excel File" to import the template
+- Click "Select Target Directory" to choose the destination
+- Click "Next" to preview the folder structure
+- Click "Start Batch Create" to execute creation
 
-3. **撤销操作**
-   - 创建完成后可点击"撤销本次创建"删除所有新建文件夹
+### 3. Undo Operation
+- After creation, click "Undo This Creation" to delete all newly created folders
 
-## 项目结构
+## Project Structure
 
 ```
 folder-batch-creator/
-├── src/                    # React 前端源码
-│   ├── services/          # API 服务层
-│   ├── store/             # Zustand 状态管理
-│   ├── hooks/              # 通用 Hooks
-│   ├── types/              # 类型定义
-│   ├── App.jsx            # 主应用组件
-│   └── index.jsx          # 入口文件
-├── src-tauri/             # Rust 后端源码
-│   ├── src/main.rs        # Tauri 命令实现
-│   ├── Cargo.toml         # Rust 依赖配置
-│   └── tauri.conf.json    # Tauri 应用配置
+├── src/                      # React frontend source
+│   ├── services/             # API service layer
+│   ├── store/               # Zustand state management
+│   ├── hooks/                # Common hooks
+│   ├── types/                # Type definitions
+│   ├── i18n/                 # Internationalization
+│   │   ├── index.js         # i18n configuration
+│   │   └── locales/         # Translation files
+│   │       ├── zh.json      # Chinese translations
+│   │       └── en.json      # English translations
+│   ├── App.jsx              # Main application component
+│   └── index.jsx            # Entry point
+├── src-tauri/               # Rust backend source
+│   ├── src/main.rs          # Tauri commands implementation
+│   ├── Cargo.toml           # Rust dependencies
+│   └── tauri.conf.json      # Tauri app configuration
 └── public/
-    └── template.xlsx      # Excel 模板示例
+    └── template.xlsx         # Excel template example
 ```
 
-## 许可证
+## License
 
 MIT License
