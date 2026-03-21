@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use tauri::AppHandle;
 use tauri_plugin_dialog::DialogExt;
 use tracing::{info, error, warn};
-use tracing_subscriber::{fmt, prelude::*, EnvFilter};
+use tracing_subscriber::{EnvFilter};
 
 // 树节点结构体 - Excel 解析后的层级结构
 #[derive(Debug, Deserialize)]
