@@ -15,6 +15,7 @@ import {
   Spin,
   Alert,
   ConfigProvider,
+  Select,
 } from 'antd';
 import {
   FileExcelOutlined,
@@ -23,21 +24,25 @@ import {
   CheckCircleOutlined,
   UploadOutlined,
   RedoOutlined,
+  GlobalOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import useAppStore from './store';
 import { parseExcel } from './services/excelParser';
 import { selectDirectory, createFolders, undoFolders } from './services/api';
+import './i18n';
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
 
 // Excel 导入组件
 function ExcelImport() {
+  const { t } = useTranslation();
   const { fileName, isParsing, setFileName, setTreeData, setParsing } = useAppStore();
 
   const handleFileUpload = async (file) => {
     if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
-      message.error('请上传 Excel 文件（.xlsx/.xls）');
+      message.error(t('validation.invalidFile'));
       return false;
     }
 
@@ -47,9 +52,9 @@ function ExcelImport() {
     try {
       const result = await parseExcel(file);
       setTreeData(result.tree);
-      message.success(`Excel 解析成功！共 ${result.rowCount} 行数据`);
+      message.success(t('messages.excelSuccess', { count: result.rowCount }));
     } catch (error) {
-      message.error(`Excel 解析失败：${error.message}`);
+      message.error(t('messages.excelError', { error: error.message }));
       setTreeData([]);
     } finally {
       setParsing(false);
@@ -61,7 +66,7 @@ function ExcelImport() {
   // 模板下载处理
   const downloadTemplate = async () => {
     try {
-      message.loading({ content: '正在下载模板...', key: 'download', duration: 0 });
+      message.loading({ content: t('messages.downloading'), key: 'download', duration: 0 });
       const response = await fetch('/template.xlsx');
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const blob = await response.blob();
@@ -75,16 +80,16 @@ function ExcelImport() {
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
       }, 100);
-      message.success({ content: '模板下载成功！', key: 'download' });
+      message.success({ content: t('messages.downloadTemplate'), key: 'download' });
     } catch (error) {
-      message.error({ content: '下载模板失败：' + error.message, key: 'download' });
+      message.error({ content: t('messages.downloadTemplateError', { error: error.message }), key: 'download' });
     }
   };
 
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
       <Button type="link" onClick={downloadTemplate}>
-        下载Excel模板
+        {t('import.downloadTemplate')}
       </Button>
       <Upload
         beforeUpload={handleFileUpload}
@@ -93,16 +98,17 @@ function ExcelImport() {
         style={{ display: 'inline-block' }}
       >
         <Button icon={<UploadOutlined />} loading={isParsing}>
-          选择 Excel 文件
+          {t('import.selectFile')}
         </Button>
       </Upload>
-      {fileName && <div style={{ marginTop: 8 }}>已选择：{fileName}</div>}
+      {fileName && <div style={{ marginTop: 8 }}>{t('import.selected')}：{fileName}</div>}
     </Space>
   );
 }
 
 // 目录选择组件
 function DirectorySelector() {
+  const { t } = useTranslation();
   const { rootDir, setRootDir } = useAppStore();
 
   const handleSelectDirectory = async () => {
@@ -110,32 +116,33 @@ function DirectorySelector() {
       const path = await selectDirectory();
       if (path) {
         setRootDir(path);
-        message.success('目录选择成功');
+        message.success(t('messages.directorySelected'));
       }
     } catch (error) {
-      message.error('目录选择失败：' + error.message);
+      message.error(t('messages.directoryError', { error: error.message }));
     }
   };
 
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
       <Button icon={<FolderOpenOutlined />} onClick={handleSelectDirectory}>
-        {rootDir ? '更换目录' : '选择目标根目录'}
+        {rootDir ? t('directory.change') : t('directory.select')}
       </Button>
-      {rootDir && <div style={{ marginTop: 8, wordBreak: 'break-all' }}>当前目录：{rootDir}</div>}
+      {rootDir && <div style={{ marginTop: 8, wordBreak: 'break-all' }}>{t('directory.current')}：{rootDir}</div>}
     </Space>
   );
 }
 
 // 文件夹预览组件
 function FolderPreview() {
+  const { t } = useTranslation();
   const { treeData } = useAppStore();
 
   if (!treeData || treeData.length === 0) {
     return (
       <div style={{ textAlign: 'center', padding: 48, color: '#999' }}>
         <EyeOutlined style={{ fontSize: 48, marginBottom: 16 }} />
-        <div>暂无文件夹数据，请先导入Excel文件</div>
+        <div>{t('preview.empty')}</div>
       </div>
     );
   }
@@ -149,13 +156,14 @@ function FolderPreview() {
 
 // 创建结果组件
 function ResultPanel() {
+  const { t } = useTranslation();
   const { lastResult, createdPaths, isCreating } = useAppStore();
 
   if (isCreating) {
     return (
       <div style={{ textAlign: 'center', padding: 48 }}>
         <Spin size="large" />
-        <div style={{ marginTop: 16 }}>正在创建文件夹...</div>
+        <div style={{ marginTop: 16 }}>{t('result.creating')}</div>
       </div>
     );
   }
@@ -164,27 +172,24 @@ function ResultPanel() {
     return (
       <div style={{ textAlign: 'center', padding: 48, color: '#999' }}>
         <CheckCircleOutlined style={{ fontSize: 48, marginBottom: 16 }} />
-        <div>点击"开始批量创建"按钮开始创建文件夹</div>
+        <div>{t('result.ready')}</div>
       </div>
     );
   }
 
   const successCount = lastResult?.created_paths?.length || createdPaths.length;
   const errorDetails = lastResult?.detail?.filter((d) => d.type === 'error') || [];
-  const successDetails = lastResult?.detail?.filter((d) => d.type === 'path') || [];
 
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
       <Alert
-        message={`创建完成！成功 ${successCount} 个`}
-        description={
-          errorDetails.length > 0 ? `失败 ${errorDetails.length} 个` : undefined
-        }
+        message={t('result.success', { count: successCount })}
+        description={errorDetails.length > 0 ? t('result.failed', { count: errorDetails.length }) : undefined}
         type={errorDetails.length > 0 ? 'warning' : 'success'}
         showIcon
       />
       {errorDetails.length > 0 && (
-        <Card title="失败详情" size="small">
+        <Card title={t('result.details')} size="small">
           {errorDetails.map((error, index) => (
             <div key={index} style={{ color: '#ff4d4f' }}>
               {error.path}: {error.error}
@@ -196,8 +201,33 @@ function ResultPanel() {
   );
 }
 
+// 语言切换组件
+function LanguageSwitch() {
+  const { i18n } = useTranslation();
+
+  const handleChange = (value) => {
+    i18n.changeLanguage(value);
+  };
+
+  return (
+    <Space>
+      <GlobalOutlined style={{ color: '#fff' }} />
+      <Select
+        value={i18n.language}
+        onChange={handleChange}
+        style={{ width: 100 }}
+        options={[
+          { value: 'zh', label: '中文' },
+          { value: 'en', label: 'English' },
+        ]}
+      />
+    </Space>
+  );
+}
+
 // 主应用组件
 export default function App() {
+  const { t } = useTranslation();
   const {
     currentStep,
     treeData,
@@ -205,11 +235,8 @@ export default function App() {
     createdPaths,
     isCreating,
     lastResult,
-    setStep,
     nextStep,
     prevStep,
-    setTreeData,
-    setRootDir,
     setCreatedPaths,
     setCreating,
     setLastResult,
@@ -217,23 +244,22 @@ export default function App() {
   } = useAppStore();
 
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const { token } = theme.useToken();
 
   // 步骤配置
   const stepItems = [
-    { key: 'import', title: '导入Excel', icon: <FileExcelOutlined /> },
-    { key: 'preview', title: '预览结构', icon: <EyeOutlined /> },
-    { key: 'result', title: '创建结果', icon: <CheckCircleOutlined /> },
+    { key: 'import', title: t('steps.import'), icon: <FileExcelOutlined /> },
+    { key: 'preview', title: t('steps.preview'), icon: <EyeOutlined /> },
+    { key: 'result', title: t('steps.result'), icon: <CheckCircleOutlined /> },
   ];
 
   // 执行批量创建
   const handleCreate = async () => {
     if (!rootDir) {
-      message.warning('请先选择目标根目录');
+      message.warning(t('messages.noDirectory'));
       return;
     }
     if (!treeData || treeData.length === 0) {
-      message.warning('请先导入 Excel 文件');
+      message.warning(t('messages.noExcel'));
       return;
     }
 
@@ -242,10 +268,10 @@ export default function App() {
       const result = await createFolders(rootDir, treeData);
       setCreatedPaths(result.created_paths);
       setLastResult(result);
-      message.success(`成功创建 ${result.created_paths.length} 个文件夹`);
+      message.success(t('messages.createSuccess', { count: result.created_paths.length }));
       nextStep();
     } catch (error) {
-      message.error('创建失败：' + error.message);
+      message.error(t('messages.createError', { error: error.message }));
     } finally {
       setCreating(false);
     }
@@ -254,17 +280,17 @@ export default function App() {
   // 执行撤销
   const handleUndo = async () => {
     if (createdPaths.length === 0) {
-      message.info('没有可撤销的操作');
+      message.info(t('messages.noUndo'));
       return;
     }
 
     try {
       await undoFolders(createdPaths);
-      message.success('已撤销本次创建');
+      message.success(t('messages.undoSuccess'));
       setCreatedPaths([]);
       setLastResult(null);
     } catch (error) {
-      message.error('撤销失败：' + error.message);
+      message.error(t('messages.undoError', { error: error.message }));
     }
   };
 
@@ -279,23 +305,23 @@ export default function App() {
       case 'import':
         return (
           <Space direction="vertical" style={{ width: '100%' }} size="large">
-            <Card title="步骤1：导入 Excel 文件">
+            <Card title={t('import.title')}>
               <ExcelImport />
             </Card>
-            <Card title="步骤2：选择目标目录">
+            <Card title={t('directory.title')}>
               <DirectorySelector />
             </Card>
           </Space>
         );
       case 'preview':
         return (
-          <Card title="文件夹结构预览">
+          <Card title={t('preview.title')}>
             <FolderPreview />
           </Card>
         );
       case 'result':
         return (
-          <Card title="创建结果">
+          <Card title={t('result.title')}>
             <ResultPanel />
           </Card>
         );
@@ -327,11 +353,12 @@ export default function App() {
           }}
         >
           <Title level={4} style={{ color: '#fff', margin: 0 }}>
-            文件夹批量创建工具
+            {t('app.title')}
           </Title>
           <Space>
-            <span style={{ color: '#fff' }}>暗色模式</span>
+            <span style={{ color: '#fff' }}>{t('app.darkMode')}</span>
             <Switch checked={isDarkMode} onChange={setIsDarkMode} />
+            <LanguageSwitch />
           </Space>
         </Header>
 
@@ -352,7 +379,7 @@ export default function App() {
           <Card>
             <Space>
               {canGoPrev && (
-                <Button onClick={prevStep}>上一步</Button>
+                <Button onClick={prevStep}>{t('actions.prev')}</Button>
               )}
               {currentStep === 'import' && (
                 <Button
@@ -360,7 +387,7 @@ export default function App() {
                   onClick={nextStep}
                   disabled={!canGoNext}
                 >
-                  下一步
+                  {t('actions.next')}
                 </Button>
               )}
               {currentStep === 'preview' && (
@@ -369,7 +396,7 @@ export default function App() {
                   onClick={handleCreate}
                   loading={isCreating}
                 >
-                  开始批量创建
+                  {t('actions.create')}
                 </Button>
               )}
               {currentStep === 'result' && (
@@ -380,9 +407,9 @@ export default function App() {
                     onClick={handleUndo}
                     disabled={createdPaths.length === 0}
                   >
-                    撤销本次创建
+                    {t('result.undo')}
                   </Button>
-                  <Button onClick={handleReset}>新建任务</Button>
+                  <Button onClick={handleReset}>{t('result.newTask')}</Button>
                 </>
               )}
             </Space>

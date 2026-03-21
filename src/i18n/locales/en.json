@@ -1,0 +1,69 @@
+{
+  "app": {
+    "title": "Batch Folder Creator",
+    "darkMode": "Dark Mode"
+  },
+  "steps": {
+    "import": "Import Excel",
+    "preview": "Preview Structure",
+    "result": "Creation Result"
+  },
+  "import": {
+    "title": "Step 1: Import Excel File",
+    "downloadTemplate": "Download Excel Template",
+    "selectFile": "Select Excel File",
+    "selected": "Selected"
+  },
+  "directory": {
+    "title": "Step 2: Select Target Directory",
+    "select": "Select Target Directory",
+    "change": "Change Directory",
+    "current": "Current Directory"
+  },
+  "preview": {
+    "title": "Folder Structure Preview",
+    "empty": "No folder data, please import Excel file first",
+    "total": "Total",
+    "folders": "folders",
+    "selected": "Selected",
+    "depth": "Depth",
+    "levels": "levels"
+  },
+  "result": {
+    "title": "Creation Result",
+    "creating": "Creating folders...",
+    "ready": "Click 'Start Batch Create' to create folders",
+    "success": "Creation completed! {count} succeeded",
+    "failed": "{count} failed",
+    "details": "Failure Details",
+    "undo": "Undo This Creation",
+    "newTask": "New Task"
+  },
+  "actions": {
+    "prev": "Previous",
+    "next": "Next",
+    "create": "Start Batch Create",
+    "undo": "Undo",
+    "reset": "Reset"
+  },
+  "messages": {
+    "excelSuccess": "Excel parsed successfully! {count} rows of data",
+    "excelError": "Excel parsing failed: {error}",
+    "directorySelected": "Directory selected successfully",
+    "directoryError": "Directory selection failed: {error}",
+    "createSuccess": "Successfully created {count} folders",
+    "createError": "Creation failed: {error}",
+    "undoSuccess": "Undo completed",
+    "undoError": "Undo failed: {error}",
+    "noUndo": "No operation to undo",
+    "noDirectory": "Please select target directory first",
+    "noExcel": "Please import Excel file first",
+    "downloadTemplate": "Template downloaded successfully!",
+    "downloadTemplateError": "Template download failed: {error}",
+    "downloading": "Downloading..."
+  },
+  "validation": {
+    "invalidFile": "Please upload Excel file (.xlsx/.xls)",
+    "emptyExcel": "Excel content is empty"
+  }
+}
