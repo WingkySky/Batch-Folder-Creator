@@ -1,7 +1,8 @@
 {
   "name": "folder-batch-creator",
-  "version": "1.0.0",
-  "description": "跨平台文件夹批量创建工具（含Excel解析、撤销等功能）",
+  "version": "2.0.0",
+  "description": "跨平台文件夹批量创建工具 - 轻量级桌面应用",
+  "type": "module",
   "scripts": {
     "dev": "tauri dev",
     "build": "tauri build",
@@ -12,18 +13,17 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@tauri-apps/api": "^1.6.0",
+    "@tauri-apps/api": "^2.0.0",
+    "@tauri-apps/plugin-dialog": "^2.0.0",
     "antd": "^5.13.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "zustand": "^4.5.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.24.5",
-    "@babel/preset-env": "^7.24.5",
-    "@babel/preset-react": "^7.24.5",
-    "@tauri-apps/cli": "^1.6.3",
-    "@vitejs/plugin-react": "^6.0.1",
-    "vite": "^8.0.0"
+    "@tauri-apps/cli": "^2.0.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "vite": "^5.0.0"
   }
 }

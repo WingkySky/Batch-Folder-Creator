@@ -1,12 +1,21 @@
-// Vite 配置文件，支持 React、热更新
+// Vite 配置文件 - Tauri + React 项目配置
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   server: {
-    port: 8080, // 与 Tauri 配置保持一致
+    port: 1420,
     strictPort: true,
+    watch: {
+      ignored: ['**/src-tauri/**'],
+    },
   },
   build: {
     outDir: 'dist',
