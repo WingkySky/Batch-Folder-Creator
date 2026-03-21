@@ -1,5 +1,7 @@
 # Batch Folder Creator
 
+[中文版](./README_zh.md) | English
+
 A lightweight cross-platform desktop application that batch-creates hierarchical folder structures from Excel templates, with one-click undo support.
 
 ## Features
