@@ -1,18 +1,27 @@
 // React 主界面组件，集成侧边栏和各功能模块骨架
-import React, { useState } from 'react';
-import { Typography, Layout, Menu } from 'antd';
+import React, { useState, Suspense } from 'react';
+import { Typography, Layout, Menu, Spin } from 'antd';
 import {
   FolderOpenOutlined,
   FileExcelOutlined,
   EyeOutlined,
   PlayCircleOutlined,
 } from '@ant-design/icons';
-import ExcelImport from './components/ExcelImport';
-import DirectorySelector from './components/DirectorySelector';
-import FolderTreePreview from './components/FolderTreePreview';
-import CreateActions from './components/CreateActions';
+
+// 组件懒加载 - 按需加载，减少初始 bundle 大小
+const ExcelImport = React.lazy(() => import('./components/ExcelImport'));
+const DirectorySelector = React.lazy(() => import('./components/DirectorySelector'));
+const FolderTreePreview = React.lazy(() => import('./components/FolderTreePreview'));
+const CreateActions = React.lazy(() => import('./components/CreateActions'));
 
 const { Header, Content, Sider } = Layout;
+
+// 加载状态组件
+const LoadingFallback = () => (
+  <div style={{ padding: 48, textAlign: 'center' }}>
+    <Spin size="large" />
+  </div>
+);
 
 // 菜单项定义
 const menuItems = [
@@ -37,22 +46,32 @@ export default function App() {
   const renderContent = () => {
     switch (selectedKey) {
       case 'import':
-        // 传递 onTreeData 回调，解析后更新 treeData
-        return <ExcelImport onTreeData={setTreeData} />;
-      case 'dir':
-        // 传递 onDirectorySelected 回调，选择后更新 rootDir
-        return <DirectorySelector onDirectorySelected={setRootDir} />;
-      case 'preview':
-        // 传递 treeData 给结构预览
-        return <FolderTreePreview treeData={treeData} />;
-      case 'action':
-        // 传递 root、treeData、onCreatedPaths 给批量创建操作
         return (
-          <CreateActions
-            root={rootDir}
-            treeData={treeData}
-            onCreatedPaths={setCreatedPaths}
-          />
+          <Suspense fallback={<LoadingFallback />}>
+            <ExcelImport onTreeData={setTreeData} />
+          </Suspense>
+        );
+      case 'dir':
+        return (
+          <Suspense fallback={<LoadingFallback />}>
+            <DirectorySelector onDirectorySelected={setRootDir} />
+          </Suspense>
+        );
+      case 'preview':
+        return (
+          <Suspense fallback={<LoadingFallback />}>
+            <FolderTreePreview treeData={treeData} />
+          </Suspense>
+        );
+      case 'action':
+        return (
+          <Suspense fallback={<LoadingFallback />}>
+            <CreateActions
+              root={rootDir}
+              treeData={treeData}
+              onCreatedPaths={setCreatedPaths}
+            />
+          </Suspense>
         );
       default:
         return null;
@@ -82,4 +101,4 @@ export default function App() {
       </Layout>
     </Layout>
   );
-} 
+}

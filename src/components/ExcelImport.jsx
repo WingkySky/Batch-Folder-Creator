@@ -84,18 +84,35 @@ export default function ExcelImport({ onTreeData }) {
         style={{ marginBottom: 8 }}
         onClick={async () => {
           try {
+            message.loading({ content: '正在下载模板...', key: 'download', duration: 0 });
+
+            // 使用 fetch 获取文件，这是最可靠的方式
             const response = await fetch('/template.xlsx');
+
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
             const blob = await response.blob();
+
+            // 创建下载链接
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = 'template.xlsx';
             document.body.appendChild(a);
             a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
+
+            // 清理
+            setTimeout(() => {
+              document.body.removeChild(a);
+              window.URL.revokeObjectURL(url);
+            }, 100);
+
+            message.success({ content: '模板下载成功！', key: 'download' });
           } catch (err) {
-            message.error('下载模板失败：' + err.message);
+            console.error('下载模板失败:', err);
+            message.error({ content: '下载模板失败：' + (err.message || '未知错误'), key: 'download' });
           }
         }}
       >
