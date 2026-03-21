@@ -1,5 +1,5 @@
 // 主应用组件 - 单页面工作流布局
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Layout,
   Steps,
@@ -228,7 +228,7 @@ function LanguageSwitch() {
 
 // 主应用组件
 export default function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const {
     currentStep,
     treeData,
@@ -245,6 +245,25 @@ export default function App() {
   } = useAppStore();
 
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // 监听语言变化，更新窗口标题
+  useEffect(() => {
+    let isMounted = true;
+    const updateWindowTitle = async () => {
+      try {
+        const { getCurrentWindow } = await import('@tauri-apps/api/window');
+        const appWindow = getCurrentWindow();
+        const title = t('app.title');
+        if (isMounted) {
+          await appWindow.setTitle(title);
+        }
+      } catch (error) {
+        console.error('Failed to update window title:', error);
+      }
+    };
+    updateWindowTitle();
+    return () => { isMounted = false; };
+  }, [i18n.language]);
 
   // 步骤配置
   const stepItems = [
