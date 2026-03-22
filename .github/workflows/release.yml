@@ -13,10 +13,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform:
-          - macos-latest
-          - ubuntu-22.04
-          - windows-latest
+        include:
+          - platform: macos-latest
+            artifact_path: src-tauri/target/release/bundle
+            artifact_pattern: "*.dmg"
+          - platform: ubuntu-22.04
+            artifact_path: src-tauri/target/release/bundle
+            artifact_pattern: "*.deb"
+          - platform: windows-latest
+            artifact_path: src-tauri/target/release/bundle
+            artifact_pattern: "*.msi"
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -59,9 +65,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run build
 
+      - name: Find artifacts
+        id: find_artifacts
+        run: |
+          echo "artifact_path=${{ matrix.artifact_path }}" >> $GITHUB_OUTPUT
+          ls -la ${{ matrix.artifact_path }}/ 2>/dev/null || echo "No bundle directory"
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: bundles-${{ matrix.platform }}
-          path: src-tauri/target/release/bundle/**
+          path: ${{ matrix.artifact_path }}
           retention-days: 1
