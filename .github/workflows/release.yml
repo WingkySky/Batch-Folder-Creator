@@ -13,15 +13,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - platform: 'macos-latest'
-            args: '--target aarch64-apple-darwin'
-          - platform: 'macos-latest'
-            args: '--target x86_64-apple-darwin'
-          - platform: 'ubuntu-22.04'
-            args: ''
-          - platform: 'windows-latest'
-            args: ''
+        platform:
+          - macos-latest
+          - ubuntu-22.04
+          - windows-latest
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -46,18 +41,15 @@ jobs:
         run: npm ci
 
       - name: Build Tauri app
-        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: ${{ matrix.args }}
+        run: |
+          npm run build:renderer
+          cargo tauri build
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: bundles-${{ matrix.platform }}
-          path: |
-            src-tauri/target/${{ matrix.platform == 'windows-latest' && 'release' || 'release' }}/bundle/**
-            !src-tauri/target/**/deps/**
-            !src-tauri/target/**/incremental/**
+          path: src-tauri/target/release/bundle/**
           retention-days: 1
