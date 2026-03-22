@@ -30,6 +30,7 @@
     "active": true,
     "targets": "all",
     "icon": [
+      "icons/icon.ico",
       "icons/app.icns",
       "icons/icon_1024.png"
     ]
