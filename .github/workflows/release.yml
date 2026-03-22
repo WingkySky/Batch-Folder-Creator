@@ -93,7 +93,7 @@ jobs:
           files: |
             artifacts/bundles-macos-latest/**/*.dmg
             artifacts/bundles-macos-latest/**/*.app
-            artifacts/bundles-ubuntu-22.04/**/*
+            artifacts/bundles-ubuntu-22.04/**/*.deb
             artifacts/bundles-windows-latest/**/*.exe
             artifacts/bundles-windows-latest/**/*.msi
           draft: false
