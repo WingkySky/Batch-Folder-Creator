@@ -66,6 +66,14 @@ jobs:
           path: build.log
           retention-days: 1
 
+      - name: Find bundle files
+        id: find-bundles
+        run: |
+          echo "=== Bundle directory structure ==="
+          find src-tauri/target/release/bundle -type f 2>/dev/null || echo "No bundle directory"
+          echo "=== Bundle directory ==="
+          ls -la src-tauri/target/release/bundle/ 2>/dev/null || echo "No bundle directory"
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -82,22 +90,22 @@ jobs:
         with:
           path: artifacts
 
-      - name: List artifacts
-        run: ls -la artifacts/
-
-      - name: Organize artifacts by platform
+      - name: List artifacts structure
         run: |
-          mkdir -p release-builds
-          for dir in artifacts/bundles-*; do
-            platform=$(basename "$dir" | sed 's/bundles-//')
-            cp -r "$dir"/* "release-builds/${platform}/" 2>/dev/null || true
-          done
-          ls -la release-builds/
+          echo "=== Artifacts directory ==="
+          ls -la artifacts/
+          echo "=== Recursive listing ==="
+          find artifacts/ -type f | head -50
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: release-builds/**/*
+          files: |
+            artifacts/bundles-macos-latest/**/*.dmg
+            artifacts/bundles-macos-latest/**/*.app
+            artifacts/bundles-ubuntu-22.04/**/*
+            artifacts/bundles-windows-latest/**/*.exe
+            artifacts/bundles-windows-latest/**/*.msi
           draft: false
           prerelease: false
         env:
