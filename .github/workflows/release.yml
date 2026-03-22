@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  build:
     strategy:
       fail-fast: false
       matrix:
@@ -71,4 +71,34 @@ jobs:
         with:
           name: bundles-${{ matrix.platform }}
           path: src-tauri/target/release/bundle/
-          retention-days: 1
+          retention-days: 2
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: List artifacts
+        run: ls -la artifacts/
+
+      - name: Organize artifacts by platform
+        run: |
+          mkdir -p release-builds
+          for dir in artifacts/bundles-*; do
+            platform=$(basename "$dir" | sed 's/bundles-//')
+            cp -r "$dir"/* "release-builds/${platform}/" 2>/dev/null || true
+          done
+          ls -la release-builds/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release-builds/**/*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
